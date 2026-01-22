@@ -63,7 +63,12 @@ module.exports = {
                 headers['Authorization'] = BLOXLINK_API_KEY;
             }
 
-            const bloxlinkRes = await fetch(`https://api.blox.link/v4/public/guilds/${lookupGuildId}/discord-to-roblox/${targetUser.id}`, {
+            const requestUrl = `https://api.blox.link/v4/public/guilds/${lookupGuildId}/discord-to-roblox/${targetUser.id}`;
+            console.log(`[Bloxlink Debug] Requesting: ${requestUrl}`);
+            console.log(`[Bloxlink Debug] Headers:`, JSON.stringify(headers));
+            console.log(`[Bloxlink Debug] GuildID: ${lookupGuildId}, TargetUserID: ${targetUser.id}`);
+
+            const bloxlinkRes = await fetch(requestUrl, {
                 headers: headers
             });
 
