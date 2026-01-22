@@ -2,13 +2,13 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('profile')
+        .setName('player')
         .setDescription('Shows a user\'s Roblox profile and stats')
         .addUserOption(option =>
             option.setName('user')
                 .setDescription('The user to lookup')
                 .setRequired(false)),
-    name: 'profile',
+    name: 'player',
     category: 'General',
     async execute(interactionOrMessage, args, client) {
         const isInteraction = !interactionOrMessage.content;
@@ -76,12 +76,21 @@ module.exports = {
                 const data = await bloxlinkRes.json();
                 robloxId = data.robloxID;
             } else {
-                if (bloxlinkRes.status === 404) {
-                    return reply({ content: `❌ **${targetUser.username}** is not linked with Bloxlink in server ID ${lookupGuildId}.` });
-                }
                 const errorText = await bloxlinkRes.text();
                 console.error('Bloxlink Error:', errorText);
-                return reply({ content: `❌ Failed to fetch Bloxlink data. (API Status: ${bloxlinkRes.status})` });
+
+                if (bloxlinkRes.status === 404) {
+                    return reply({ content: `❌ **${targetUser.username}** is not linked with Bloxlink in server ID \`${lookupGuildId}\`.` });
+                }
+
+                // Return detailed error for debugging 400s
+                return reply({
+                    content: `❌ **Bloxlink API Error** (${bloxlinkRes.status})\n` +
+                        `**Guild ID Used:** \`${lookupGuildId}\`\n` +
+                        `**User ID:** \`${targetUser.id}\`\n` +
+                        `**Raw Error:** \`${errorText}\`\n` +
+                        `**URL:** \`${requestUrl}\``
+                });
             }
 
             if (!robloxId) {
