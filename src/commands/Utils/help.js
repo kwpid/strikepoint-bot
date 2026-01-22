@@ -47,6 +47,16 @@ module.exports = {
             };
         });
 
+        if (categories.length === 0) {
+            const errorEmbed = new EmbedBuilder()
+                .setTitle('STRIKEPOINT Help')
+                .setDescription('No commands were found.')
+                .setColor('#FF0000');
+            return isInteraction
+                ? interactionOrMessage.reply({ embeds: [errorEmbed], ephemeral: true })
+                : interactionOrMessage.reply({ embeds: [errorEmbed] });
+        }
+
         const initialEmbed = new EmbedBuilder()
             .setTitle('STRIKEPOINT Help')
             .setDescription('Please select a category from the dropdown menu to see the commands.')

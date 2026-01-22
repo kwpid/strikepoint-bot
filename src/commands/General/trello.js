@@ -9,21 +9,71 @@ module.exports = {
     async execute(interactionOrMessage, args, client) {
         const isInteraction = !interactionOrMessage.content;
 
-        const embed = new EmbedBuilder()
-            .setTitle('Trello Updates')
-            .setDescription('Here are the recent updates from Trello:')
-            .setColor('#0099FF')
-            .addFields(
-                { name: 'Update 1', value: 'Added new feature X', inline: false },
-                { name: 'Update 2', value: 'Fixed bug Y', inline: false },
-                { name: 'Link', value: '[Click here to view Board](https://trello.com)', inline: false }
-            )
-            .setFooter({ text: 'This is a placeholder for Trello API integration' });
+        // Helper to reply
+        const reply = async (content) => {
+            if (isInteraction) {
+                if (interactionOrMessage.deferred) {
+                    await interactionOrMessage.editReply(content);
+                } else {
+                    await interactionOrMessage.reply(content);
+                }
+            } else {
+                await interactionOrMessage.reply(content);
+            }
+        };
 
-        if (isInteraction) {
-            await interactionOrMessage.reply({ embeds: [embed] });
-        } else {
-            await interactionOrMessage.reply({ embeds: [embed] });
+        const { TRELLO_API_KEY, TRELLO_TOKEN, TRELLO_BOARD_ID } = process.env;
+
+        if (!TRELLO_API_KEY || !TRELLO_TOKEN || !TRELLO_BOARD_ID) {
+            return reply({ content: '❌ Trello configuration is missing. Please set TRELLO_API_KEY, TRELLO_TOKEN, and TRELLO_BOARD_ID.', ephemeral: true });
+        }
+
+        try {
+            if (isInteraction) await interactionOrMessage.deferReply();
+
+            // 1. Get Lists from Board
+            const listsResponse = await fetch(`https://api.trello.com/1/boards/${TRELLO_BOARD_ID}/lists?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}`);
+            if (!listsResponse.ok) throw new Error('Failed to fetch Trello lists');
+            const lists = await listsResponse.json();
+
+            // Find a list that might contain updates (e.g., "Done", "Updates", "Changelog" or just the first one)
+            // You might want to make this configurable or argument-based. 
+            // For now, let's look for "Done" or "Completed" or "Updates", fallback to first list.
+            const updateList = lists.find(l => l.name.match(/(Update|Change|Done|Complete)/i)) || lists[0];
+
+            if (!updateList) {
+                return reply({ content: '❌ Could not find a suitable list on the Trello board.' });
+            }
+
+            // 2. Get Cards from that List
+            const cardsResponse = await fetch(`https://api.trello.com/1/lists/${updateList.id}/cards?key=${TRELLO_API_KEY}&token=${TRELLO_TOKEN}&limit=10`);
+            if (!cardsResponse.ok) throw new Error('Failed to fetch Trello cards');
+            const cards = await cardsResponse.json();
+
+            const embed = new EmbedBuilder()
+                .setTitle(`Trello: ${updateList.name}`)
+                .setDescription(`Latest updates from [Trello Board](https://trello.com/b/${TRELLO_BOARD_ID})`)
+                .setColor('#0099FF')
+                .setFooter({ text: 'Powered by Trello' })
+                .setTimestamp();
+
+            if (cards.length === 0) {
+                embed.addFields({ name: 'No updates', value: 'No cards found in this list.' });
+            } else {
+                cards.forEach(card => {
+                    embed.addFields({
+                        name: card.name,
+                        value: card.desc ? (card.desc.length > 100 ? card.desc.substring(0, 97) + '...' : card.desc) : 'No description',
+                        inline: false
+                    });
+                });
+            }
+
+            await reply({ embeds: [embed] });
+
+        } catch (error) {
+            console.error('Trello Command Error:', error);
+            await reply({ content: '❌ An error occurred while fetching Trello updates.' });
         }
     },
 };
