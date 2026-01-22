@@ -51,20 +51,20 @@ module.exports = {
         // Use configured GUILD_ID or the one requested by user (1461521777191813152) as default
         const lookupGuildId = BLOXLINK_GUILD_ID || '1461521777191813152';
 
-        if (!BLOXLINK_API_KEY) {
-            return reply({ content: '❌ Bloxlink configuration is missing. Please set BLOXLINK_API_KEY.', ephemeral: true });
-        }
+        // Check removed: we proceed even without API KEY as requested
 
         try {
             // 1. Resolve Discord ID to Roblox ID using Bloxlink
-            // Documentation implies: https://api.blox.link/v4/public/guilds/{guildId}/discord-to-roblox/{discordId}
 
             let robloxId = null;
 
+            const headers = {};
+            if (BLOXLINK_API_KEY) {
+                headers['Authorization'] = BLOXLINK_API_KEY;
+            }
+
             const bloxlinkRes = await fetch(`https://api.blox.link/v4/public/guilds/${lookupGuildId}/discord-to-roblox/${targetUser.id}`, {
-                headers: {
-                    'Authorization': BLOXLINK_API_KEY
-                }
+                headers: headers
             });
 
             if (bloxlinkRes.ok) {
