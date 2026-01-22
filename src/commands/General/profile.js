@@ -106,14 +106,14 @@ module.exports = {
                 .setThumbnail(thumbUrl)
                 .setColor('#2B2D31')
                 .addFields(
-                    { name: '🆔 Roblox ID', value: `${robloxId}`, inline: true },
-                    { name: '📅 Created', value: `<t:${Math.floor(new Date(userData.created).getTime() / 1000)}:d>`, inline: true },
+                    { name: 'Roblox ID', value: `${robloxId}`, inline: true },
+                    { name: 'Created', value: `<t:${Math.floor(new Date(userData.created).getTime() / 1000)}:d>`, inline: true },
                     { name: '\u200b', value: '\u200b', inline: true }, // Spacer
 
                     // Placeholder Stats
-                    { name: '🏆 Wins', value: '0', inline: true },
-                    { name: '💀 Losses', value: '0', inline: true },
-                    { name: '📊 Rank', value: 'Bronze I', inline: true }
+                    { name: 'Wins', value: '0', inline: true },
+                    { name: 'Losses', value: '0', inline: true },
+                    { name: 'Rank', value: 'Bronze I', inline: true }
                 )
                 .setFooter({ text: 'Stats are placeholders', iconURL: client.user.displayAvatarURL() })
                 .setTimestamp();

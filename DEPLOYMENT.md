@@ -39,7 +39,7 @@ You will need to add the following environment variables during setup or in the 
     -   **TRELLO_TOKEN**: Generate a token manually from the same page where you get the API Key.
     -   **TRELLO_BOARD_ID**: The ID of the board you want to track changes from (you can find this in the URL of your board as `.../b/BOARD_ID/...` or by appending `.json` to the board URL).
 -   **Bloxlink Configuration** (Required for `!profile` command):
-    -   **BLOXLINK_API_KEY**: Get this from the [Bloxlink Developer Portal](https://www.blox.link/dashboard/developer). You may need to create an application and request an API key.
+    -   **BLOXLINK_API_KEY**: (Optional) Get this from the [Bloxlink Developer Portal](https://www.blox.link/dashboard/developer). If not provided, the bot will attempt to use public endpoints.
     -   **BLOXLINK_GUILD_ID**: (Optional) The Discord Server ID where the bot should look for linked users. Defaults to `1461521777191813152` if not set, or attempts to use the current server ID.
 
 ### 4. Deploy
