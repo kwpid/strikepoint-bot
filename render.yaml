@@ -17,3 +17,7 @@ services:
         sync: false
       - key: TRELLO_BOARD_ID
         sync: false
+      - key: BLOXLINK_API_KEY
+        sync: false
+      - key: BLOXLINK_GUILD_ID
+        sync: false
